@@ -1,0 +1,137 @@
+version: 2.1
+
+description: |
+  Send test results to BuildPulse (https://buildpulse.io) to help you identify and eliminate flaky tests.
+
+display:
+  home_url: https://github.com/Workshop64/buildpulse-circleci-orb
+
+orbs:
+  aws-cli: circleci/aws-cli@0.1.19
+
+commands:
+  setup:
+    description: Install BuildPulse uploader and optionally configure credentials
+
+    parameters:
+      access-key-id:
+        description: |
+          BuildPulse access key ID. Set this to the name of the environment
+          variable you will use to hold this value
+          (e.g., BUILDPULSE_ACCESS_KEY_ID).
+        type: env_var_name
+        default: BUILDPULSE_ACCESS_KEY_ID
+
+      secret-access-key:
+        description: |
+          BuildPulse secret access key. Set this to the name of the environment
+          variable you will use to hold this value
+          (e.g., BUILDPULSE_SECRET_ACCESS_KEY).
+        type: env_var_name
+        default: BUILDPULSE_SECRET_ACCESS_KEY
+
+    steps:
+      - run:
+          name: Configure BuildPulse region
+          command: echo "export BUILDPULSE_REGION=us-east-2" >> $BASH_ENV
+
+      - aws-cli/setup:
+          profile-name: buildpulse
+          aws-region: BUILDPULSE_REGION
+          aws-access-key-id: << parameters.access-key-id >>
+          aws-secret-access-key: << parameters.secret-access-key >>
+
+  upload:
+    description: Send test results to BuildPulse
+
+    parameters:
+      account-id:
+        description: |
+          BuildPulse's unique identifier for the account that owns the
+          repository.
+        type: integer
+
+      repository-id:
+        description: |
+          BuildPulse's unique identifier for the repository.
+        type: integer
+
+      path:
+        description: |
+          Relative path to the directory that contains the XML files for the
+          test results (e.g., "test/reports").
+        type: string
+
+    steps:
+      - run:
+          name: Send test results to BuildPulse
+          when: always
+          command: |
+            REPORT_PATH=<< parameters.path >>
+            if [ ! -d "$REPORT_PATH" ]
+            then
+              echo "The given report path is not a directory: ${REPORT_PATH}"
+              echo "To resolve this issue, set the buildpulse/upload 'path' parameter to the directory that contains your test report(s)."
+              exit 1
+            fi
+
+            METADATA_PATH=${REPORT_PATH}/buildpulse.yml
+            TIMESTAMP=$(date --iso-8601=seconds)
+            TREE_SHA1=$(git log -1 --pretty=format:'%T')
+            UUID=$(cat /proc/sys/kernel/random/uuid)
+
+            cat \<< EOF > "$METADATA_PATH"
+            ---
+            :branch: $CIRCLE_BRANCH
+            :build_url: $CIRCLE_BUILD_URL
+            :check: ${BUILDPULSE_CHECK_NAME:-circleci}
+            :commit: $CIRCLE_SHA1
+            :job: $CIRCLE_JOB
+            :repo_name: $CIRCLE_PROJECT_REPONAME
+            :repo_owner: $CIRCLE_PROJECT_USERNAME
+            :repo_url: $CIRCLE_REPOSITORY_URL
+            :timestamp: '$TIMESTAMP'
+            :tree: $TREE_SHA1
+            :workflow_id: $CIRCLE_WORKFLOW_ID
+            EOF
+
+            ARCHIVE_PATH=/tmp/buildpulse-${UUID}.gz
+            tar -zcf "${ARCHIVE_PATH}" "${REPORT_PATH}"
+
+            S3_URL=s3://<< parameters.account-id >>.buildpulse-uploads/<< parameters.repository-id >>/
+
+            aws s3 cp "${ARCHIVE_PATH}" "${S3_URL}" --profile buildpulse
+
+examples:
+  send-test-results-to-buildpulse:
+    description: Easily send your test results to BuildPulse in your jobs.
+    usage:
+      version: 2.1
+
+      orbs:
+        buildpulse: workshop64/buildpulse@x.y
+
+      jobs:
+        build:
+          docker:
+            - image: circleci/<some-docker-image>
+          steps:
+            - checkout
+
+            # 📣 Be sure to execute this step *before* running your tests
+            - buildpulse/setup:
+                access-key-id: BUILDPULSE_ACCESS_KEY_ID
+                secret-access-key: BUILDPULSE_SECRET_ACCESS_KEY
+
+            - run: echo "Run your tests and generate XML reports for your test results"
+
+            - buildpulse/upload:
+                path: test/reports
+                account-id: <buildpulse-account-id>
+                repository-id: <buildpulse-repository-id>
+
+      workflows:
+        version: 2
+        commit:
+          jobs:
+            - build
