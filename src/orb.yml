@@ -62,11 +62,26 @@ commands:
           test results (e.g., "test/reports").
         type: string
 
+      when-branch-matches:
+        description:
+          By default, test results are always uploaded, regardless of the
+          current branch. To configure BuildPulse to only upload results for
+          certain branches, specify a regular expression to identify branch
+          names for the branches that should have their test results uploaded.
+        type: string
+        default: ".*"
+
     steps:
       - run:
           name: Send test results to BuildPulse
           when: always
           command: |
+            if ! [[ "$CIRCLE_BRANCH" =~ << parameters.when-branch-matches >> ]]
+            then
+              echo "The current branch (${CIRCLE_BRANCH}) does not match the regex specified in the when-branch-matches parameter (<< parameters.when-branch-matches >>). Skipping BuildPulse upload."
+              exit 0
+            fi
+
             REPORT_PATH=<< parameters.path >>
             if [ ! -d "$REPORT_PATH" ]
             then
