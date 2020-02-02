@@ -1,4 +1,4 @@
-# BuildPulse CircleCI Orb [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/Workshop64/buildpulse-circleci-orb/master/LICENSE)
+# BuildPulse CircleCI Orb [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/workshop64/buildpulse)](https://circleci.com/orbs/registry/orb/workshop64/buildpulse) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/Workshop64/buildpulse-circleci-orb/master/LICENSE)
 
 Easily send test results to [BuildPulse](https://buildpulse.io) from your CircleCI jobs.
 
