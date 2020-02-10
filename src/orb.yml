@@ -11,7 +11,9 @@ orbs:
 
 commands:
   setup:
-    description: Install BuildPulse uploader and optionally configure credentials
+    description: |
+      Install BuildPulse uploader and optionally configure credentials.
+      📣 Be sure to run this command *before* running your tests.
 
     parameters:
       access-key-id:
@@ -42,7 +44,7 @@ commands:
           aws-secret-access-key: << parameters.secret-access-key >>
 
   upload:
-    description: Send test results to BuildPulse
+    description: Send test results to BuildPulse.
 
     parameters:
       account-id:
