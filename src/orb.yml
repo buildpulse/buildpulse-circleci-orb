@@ -51,12 +51,24 @@ commands:
         description: |
           BuildPulse's unique identifier for the account that owns the
           repository.
+
+          You can specify the account ID using this parameter or by setting
+          the BUILDPULSE_ACCOUNT_ID environment variable. If the parameter
+          is specified and the environment variable is set, the parameter takes
+          precedence.
         type: integer
+        default: -1
 
       repository-id:
         description: |
           BuildPulse's unique identifier for the repository.
+
+          You can specify the repository ID using this parameter or by setting
+          the BUILDPULSE_REPOSITORY_ID environment variable. If the parameter
+          is specified and the environment variable is set, the parameter takes
+          precedence.
         type: integer
+        default: -1
 
       path:
         description: |
@@ -82,6 +94,34 @@ commands:
             then
               echo "The current branch (${CIRCLE_BRANCH}) does not match the regex specified in the when-branch-matches parameter (<< parameters.when-branch-matches >>). Skipping BuildPulse upload."
               exit 0
+            fi
+
+            if [ << parameters.account-id >> -eq -1 ]
+            then
+              if [ -z "${BUILDPULSE_ACCOUNT_ID+x}" ]
+              then
+                echo "No account ID given."
+                echo "To resolve this issue, set the buildpulse/upload 'account-id' parameter to your BuildPulse Account ID. Alternatively, you can set the 'BUILDPULSE_ACCOUNT_ID' environment variable to your BuildPulse Account ID."
+                exit 1
+              else
+                ACCOUNT_ID="$BUILDPULSE_ACCOUNT_ID"
+              fi
+            else
+              ACCOUNT_ID=<< parameters.account-id >>
+            fi
+
+            if [ << parameters.repository-id >> -eq -1 ]
+            then
+              if [ -z "${BUILDPULSE_REPOSITORY_ID+x}" ]
+              then
+                echo "No repository ID given."
+                echo "To resolve this issue, set the buildpulse/upload 'repository-id' parameter to the BuildPulse ID for your repository. Alternatively, you can set the 'BUILDPULSE_REPOSITORY_ID' environment variable to the BuildPulse ID for your repository."
+                exit 1
+              else
+                REPOSITORY_ID="$BUILDPULSE_REPOSITORY_ID"
+              fi
+            else
+              REPOSITORY_ID=<< parameters.repository-id >>
             fi
 
             REPORT_PATH=<< parameters.path >>
@@ -113,7 +153,7 @@ commands:
             ARCHIVE_PATH=/tmp/buildpulse-${UUID}.gz
             tar -zcf "${ARCHIVE_PATH}" "${REPORT_PATH}"
 
-            S3_URL=s3://<< parameters.account-id >>.buildpulse-uploads/<< parameters.repository-id >>/
+            S3_URL=s3://$ACCOUNT_ID.buildpulse-uploads/$REPOSITORY_ID/
 
             aws s3 cp "${ARCHIVE_PATH}" "${S3_URL}" --profile buildpulse
 
