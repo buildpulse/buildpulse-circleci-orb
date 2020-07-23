@@ -135,7 +135,9 @@ commands:
         default: BUILDPULSE_SECRET_ACCESS_KEY
 
     steps:
-      - run: echo "⚠️⚠️⚠️ The buildpulse/setup command is deprecated. Please remove it from your workflow. This command is no longer needed, and it will be removed in an upcoming release."
+      - run:
+          name: "Announce deprecation of buildpulse/setup command"
+          command: echo "⚠️⚠️⚠️ The buildpulse/setup command is deprecated. Please remove it from your workflow. This command is no longer needed, and it will be removed in an upcoming release."
 
 examples:
   send-test-results-to-buildpulse:
