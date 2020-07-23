@@ -6,42 +6,23 @@ description: |
 display:
   home_url: https://github.com/Workshop64/buildpulse-circleci-orb
 
-orbs:
-  aws-cli: circleci/aws-cli@0.1.19
-
 commands:
   setup:
-    description: |
-      Install BuildPulse uploader and optionally configure credentials.
-      📣 Be sure to run this command *before* running your tests.
+    description: Deprecated. This command is no longer needed and no longer used. It will be removed in an upcoming release.
 
     parameters:
       access-key-id:
-        description: |
-          BuildPulse access key ID. Set this to the name of the environment
-          variable you will use to hold this value
-          (e.g., BUILDPULSE_ACCESS_KEY_ID).
+        description: Deprecated. This parameter is no longer needed and no longer used.
         type: env_var_name
         default: BUILDPULSE_ACCESS_KEY_ID
 
       secret-access-key:
-        description: |
-          BuildPulse secret access key. Set this to the name of the environment
-          variable you will use to hold this value
-          (e.g., BUILDPULSE_SECRET_ACCESS_KEY).
+        description: Deprecated. This parameter is no longer needed and no longer used.
         type: env_var_name
         default: BUILDPULSE_SECRET_ACCESS_KEY
 
     steps:
-      - run:
-          name: Configure BuildPulse region
-          command: echo "export BUILDPULSE_REGION=us-east-2" >> $BASH_ENV
-
-      - aws-cli/setup:
-          profile-name: buildpulse
-          aws-region: BUILDPULSE_REGION
-          aws-access-key-id: << parameters.access-key-id >>
-          aws-secret-access-key: << parameters.secret-access-key >>
+      - run: echo "⚠️⚠️⚠️ The buildpulse/setup command is deprecated. Please remove it from your workflow. This command is no longer needed, and it will be removed in an upcoming release."
 
   upload:
     description: Send test results to BuildPulse.
