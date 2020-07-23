@@ -47,6 +47,22 @@ commands:
     description: Send test results to BuildPulse.
 
     parameters:
+      access-key-id:
+        description: |
+          BuildPulse access key ID. Set this to the name of the environment
+          variable you will use to hold this value
+          (e.g., BUILDPULSE_ACCESS_KEY_ID).
+        type: env_var_name
+        default: BUILDPULSE_ACCESS_KEY_ID
+
+      secret-access-key:
+        description: |
+          BuildPulse secret access key. Set this to the name of the environment
+          variable you will use to hold this value
+          (e.g., BUILDPULSE_SECRET_ACCESS_KEY).
+        type: env_var_name
+        default: BUILDPULSE_SECRET_ACCESS_KEY
+
       account-id:
         description: |
           BuildPulse's unique identifier for the account that owns the
@@ -132,30 +148,13 @@ commands:
               exit 1
             fi
 
-            METADATA_PATH=${REPORT_PATH}/buildpulse.yml
-            TIMESTAMP=$(date --iso-8601=seconds)
-            UUID=$(cat /proc/sys/kernel/random/uuid)
+            curl -fsSL https://github.com/buildpulse/test-reporter/releases/latest/download/test-reporter-linux-amd64 > ./buildpulse-test-reporter
 
-            cat \<< EOF > "$METADATA_PATH"
-            ---
-            :branch: $CIRCLE_BRANCH
-            :build_url: $CIRCLE_BUILD_URL
-            :check: ${BUILDPULSE_CHECK_NAME:-circleci}
-            :commit: $CIRCLE_SHA1
-            :job: $CIRCLE_JOB
-            :repo_name: $CIRCLE_PROJECT_REPONAME
-            :repo_owner: $CIRCLE_PROJECT_USERNAME
-            :repo_url: $CIRCLE_REPOSITORY_URL
-            :timestamp: '$TIMESTAMP'
-            :workflow_id: $CIRCLE_WORKFLOW_ID
-            EOF
+            chmod +x ./buildpulse-test-reporter
 
-            ARCHIVE_PATH=/tmp/buildpulse-${UUID}.gz
-            tar -zcf "${ARCHIVE_PATH}" "${REPORT_PATH}"
-
-            S3_URL=s3://$ACCOUNT_ID.buildpulse-uploads/$REPOSITORY_ID/
-
-            aws s3 cp "${ARCHIVE_PATH}" "${S3_URL}" --profile buildpulse
+            BUILDPULSE_ACCESS_KEY_ID=$<< parameters.access-key-id >> \
+              BUILDPULSE_SECRET_ACCESS_KEY=$<< parameters.secret-access-key >> \
+              ./buildpulse-test-reporter submit "${REPORT_PATH}" --account-id $ACCOUNT_ID --repository-id $REPOSITORY_ID
 
 examples:
   send-test-results-to-buildpulse:
@@ -172,11 +171,6 @@ examples:
             - image: circleci/<some-docker-image>
           steps:
             - checkout
-
-            # 📣 Be sure to execute this step *before* running your tests
-            - buildpulse/setup:
-                access-key-id: BUILDPULSE_ACCESS_KEY_ID
-                secret-access-key: BUILDPULSE_SECRET_ACCESS_KEY
 
             - run: echo "Run your tests and generate XML reports for your test results"
 
