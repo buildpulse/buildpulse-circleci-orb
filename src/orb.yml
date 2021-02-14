@@ -56,6 +56,12 @@ commands:
           test results (e.g., "test/reports").
         type: string
 
+      repository-path:
+        description: |
+          Path to the local git clone of the repository (default: ".").
+        type: string
+        default: "."
+
       when-branch-matches:
         description:
           By default, test results are always uploaded, regardless of the
@@ -112,13 +118,21 @@ commands:
               exit 1
             fi
 
+            REPOSITORY_PATH=<< parameters.repository-path >>
+            if [ ! -d "$REPOSITORY_PATH" ]
+            then
+              echo "The given repository path is not a directory: ${REPOSITORY_PATH}"
+              echo "To resolve this issue, set the buildpulse/upload 'repository-path' parameter to the directory that contains the local git clone of your repository."
+              exit 1
+            fi
+
             curl -fsSL https://github.com/buildpulse/test-reporter/releases/latest/download/test-reporter-linux-amd64 > ./buildpulse-test-reporter
 
             chmod +x ./buildpulse-test-reporter
 
             BUILDPULSE_ACCESS_KEY_ID=$<< parameters.access-key-id >> \
               BUILDPULSE_SECRET_ACCESS_KEY=$<< parameters.secret-access-key >> \
-              ./buildpulse-test-reporter submit "${REPORT_PATH}" --account-id $ACCOUNT_ID --repository-id $REPOSITORY_ID
+              ./buildpulse-test-reporter submit "${REPORT_PATH}" --account-id $ACCOUNT_ID --repository-id $REPOSITORY_ID --repository-dir $REPOSITORY_PATH
 
   setup:
     description: Deprecated. This command is no longer needed and no longer used. It will be removed in an upcoming release.
