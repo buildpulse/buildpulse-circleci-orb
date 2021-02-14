@@ -24,11 +24,6 @@ jobs:
     steps:
       - checkout
 
-      # 📣 Be sure to execute this step *before* running your tests
-      - buildpulse/setup:
-          access-key-id: BUILDPULSE_ACCESS_KEY_ID
-          secret-access-key: BUILDPULSE_SECRET_ACCESS_KEY
-
       - run: echo "Run your tests and generate XML reports for your test results"
 
       - buildpulse/upload:
