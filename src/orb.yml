@@ -126,7 +126,9 @@ commands:
               exit 1
             fi
 
-            curl -fsSL https://github.com/buildpulse/test-reporter/releases/latest/download/test-reporter-linux-amd64 > ./buildpulse-test-reporter
+            set -x
+
+            curl -fsSL --retry 3 --connect-timeout 5 https://github.com/buildpulse/test-reporter/releases/latest/download/test-reporter-linux-amd64 > ./buildpulse-test-reporter
 
             chmod +x ./buildpulse-test-reporter
 
