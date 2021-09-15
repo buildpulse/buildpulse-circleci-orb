@@ -8,7 +8,7 @@ See [this orb's listing in CircleCI's Orbs Registry](https://circleci.com/orbs/r
 
 ## Example
 
-In this example `config.yml` snippet, the `buildpulse/setup` command installs the BuildPulse uploader and identifies the environment variables that contain the required BuildPulse secrets (Access Key ID and Secret Access Key). Then, after your tests run, the `buildpulse/upload` command sends the test results to BuildPulse for analysis.
+In this example `config.yml` snippet, after your tests run, the `buildpulse/upload` command sends the test results to BuildPulse for analysis.
 
 ```yaml
 version: 2.1
