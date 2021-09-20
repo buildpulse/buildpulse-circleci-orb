@@ -128,7 +128,7 @@ commands:
 
             set -x
 
-            curl -fsSL --retry 3 --connect-timeout 5 https://github.com/buildpulse/test-reporter/releases/latest/download/test-reporter-linux-amd64 > ./buildpulse-test-reporter
+            curl -fsSL --retry 3 --connect-timeout 5 https://github.com/buildpulse/test-reporter/releases/latest/download/test_reporter_linux_amd64 > ./buildpulse-test-reporter
 
             chmod +x ./buildpulse-test-reporter
 
