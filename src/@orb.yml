@@ -126,9 +126,30 @@ commands:
               exit 1
             fi
 
-            set -x
+            getcli() {
+              urls=(
+                https://get.buildpulse.io/test-reporter-linux-amd64
+                https://github.com/buildpulse/test-reporter/releases/latest/download/test-reporter-linux-amd64
+              )
 
-            curl -fsSL --retry 3 --retry-connrefused --connect-timeout 5 https://get.buildpulse.io/test-reporter-linux-amd64 > ./buildpulse-test-reporter
+              for url in ${urls[@]}; do
+                (set -x; curl -fsSL --retry 3 --retry-connrefused --connect-timeout 5 $url)
+              done;
+            }
+
+            if getcli > ./buildpulse-test-reporter; then
+              : # Successfully fetched binary. Great!
+            else
+              echo ❌ Unable to send test results to BuildPulse. See details below.
+              echo
+              echo Downloading the BuildPulse test-reporter failed.
+              echo
+              echo We never want BuildPulse to make your builds unstable. Since we're having trouble downloading the BuildPulse test-reporter, we're skipping the BuildPulse analysis for this build.
+              echo
+              echo If you continue seeing this problem, please get in get in touch at https://buildpulse.io/contact so we can look into this issue.
+
+              exit 0
+            fi
 
             chmod +x ./buildpulse-test-reporter
 
