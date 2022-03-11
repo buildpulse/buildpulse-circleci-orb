@@ -83,7 +83,7 @@ commands:
             INPUT_PATH: << parameters.path >>
             INPUT_REPOSITORY_PATH: << parameters.repository-path >>
             INPUT_WHEN_BRANCH_MATCHES: << parameters.when-branch-matches >>
-          command: << include(scripts/upload.sh) >>
+          command: << include(upload.sh) >>
 
   setup:
     description: Deprecated. This command is no longer needed and no longer used. It will be removed in an upcoming release.
