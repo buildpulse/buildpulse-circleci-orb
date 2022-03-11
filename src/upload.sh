@@ -80,7 +80,6 @@ fi
 
 chmod +x ./buildpulse-test-reporter
 
-# TODO: Make sure this works when the access-key-id parameter and secret-access-key parameter are set
 BUILDPULSE_ACCESS_KEY_ID="${!INPUT_ACCESS_KEY_ID}" \
 	BUILDPULSE_SECRET_ACCESS_KEY="${!INPUT_SECRET_ACCESS_KEY}" \
 	./buildpulse-test-reporter submit "${REPORT_PATH}" --account-id $ACCOUNT_ID --repository-id $REPOSITORY_ID --repository-dir $REPOSITORY_PATH
