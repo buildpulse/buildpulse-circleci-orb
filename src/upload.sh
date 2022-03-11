@@ -49,14 +49,12 @@ then
 fi
 
 getcli() {
-	urls=(
-		https://get.buildpulse.io/test-reporter-linux-amd64
-		https://github.com/buildpulse/test-reporter/releases/latest/download/test-reporter-linux-amd64
-	)
+	fetch() {
+		(set -x; curl -fsSL --retry 3 --retry-connrefused --connect-timeout 5 $1)
+	}
 
-	for url in ${urls[@]}; do
-		(set -x; curl -fsSL --retry 3 --retry-connrefused --connect-timeout 5 $url)
-	done;
+	fetch https://get.buildpulse.io/test-reporter-linux-amd64 || \
+		fetch https://github.com/buildpulse/test-reporter/releases/latest/download/test-reporter-linux-amd64
 }
 
 if getcli > ./buildpulse-test-reporter; then
