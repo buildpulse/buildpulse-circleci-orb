@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+  echo "Usage: $0 <version>"
+  exit 1
+fi
+
+
+set -ex
+
+mkdir -p dist
+
+rm -rf dist/orb.yml
+
+circleci orb pack src > dist/orb.yml
+
+circleci orb validate dist/orb.yml
+
+circleci orb publish dist/orb.yml workshop64/buildpulse@dev:$1
+
+set +x
+
+cat <<eos
+⏭️ When you're ready to promote this version to production, run...
+⏭️
+⏭️ $ circleci orb publish promote workshop64/buildpulse@dev:$1 minor
+eos
