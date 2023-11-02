@@ -27,9 +27,16 @@ jobs:
       - run: echo "Run your tests and generate XML reports for your test results"
 
       - buildpulse/upload:
-          path: test/reports
+          account-id: 123 
+          repository-id: 123
+          path: ./spec/reports
+          access-key-id: BUILDPULSE_ACCESS_KEY_ID
+          secret-access-key: BUILDPULSE_SECRET_ACCESS_KEY
+          path: test/reports # path to JUnit XML file
           account-id: <buildpulse-account-id>
           repository-id: <buildpulse-repository-id>
+          coverage-files: ./coverage/lcov/project.lcov # optional
+          tags: tag1 tag2 tag3 # optional
 
 workflows:
   version: 2

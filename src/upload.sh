@@ -1,3 +1,9 @@
+
+# Enable double globbing if supported by the shell on the base github runner
+if shopt -s globstar; then
+	echo "This bash shell version supports double globbing: '${BASH_VERSION}'."
+fi
+
 if ! [[ "$CIRCLE_BRANCH" =~ $INPUT_WHEN_BRANCH_MATCHES ]]
 then
 	echo "The current branch (${CIRCLE_BRANCH}) does not match the regex specified in the when-branch-matches parameter ($INPUT_WHEN_BRANCH_MATCHES). Skipping BuildPulse upload."
@@ -32,13 +38,15 @@ else
 	REPOSITORY_ID=$INPUT_REPOSITORY_ID
 fi
 
+for path in $INPUT_PATH; do
+	if [ ! -e "$path" ]
+	then
+		echo "🐛 The given path does not exist: $path"
+		echo "🧰 To resolve this issue, set the 'path' parameter to the location of your XML test report(s)."
+		exit 1
+	fi
+done
 REPORT_PATH="${INPUT_PATH}"
-if [ ! -d "$REPORT_PATH" ]
-then
-	echo "The given report path is not a directory: ${REPORT_PATH}"
-	echo "To resolve this issue, set the buildpulse/upload 'path' parameter to the directory that contains your test report(s)."
-	exit 1
-fi
 
 REPOSITORY_PATH="${INPUT_REPOSITORY_PATH}"
 if [ ! -d "$REPOSITORY_PATH" ]
@@ -80,4 +88,4 @@ chmod +x ./buildpulse-test-reporter
 
 BUILDPULSE_ACCESS_KEY_ID="${!INPUT_ACCESS_KEY_ID}" \
 	BUILDPULSE_SECRET_ACCESS_KEY="${!INPUT_SECRET_ACCESS_KEY}" \
-	./buildpulse-test-reporter submit "${REPORT_PATH}" --account-id $ACCOUNT_ID --repository-id $REPOSITORY_ID --repository-dir $REPOSITORY_PATH
+	./buildpulse-test-reporter submit "${REPORT_PATH}" --account-id "${ACCOUNT_ID}" --repository-id "${REPOSITORY_ID}" --repository-dir "${REPOSITORY_PATH}" --coverage-files "${INPUT_COVERAGE_FILES}" --tags "${INPUT_TAGS}" --disable-coverage-auto

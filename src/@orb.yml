@@ -56,6 +56,18 @@ commands:
           test results (e.g., "test/reports").
         type: string
 
+      coverage-files:
+        description: |
+          Paths to coverage files (space-separated).
+        default: ""
+        type: string
+
+      tags:
+        description: |
+          Tags to apply to this build (space-separated).
+        default: ""
+        type: string
+
       repository-path:
         description: |
           Path to the local git clone of the repository (default: ".").
@@ -83,6 +95,8 @@ commands:
             INPUT_PATH: << parameters.path >>
             INPUT_REPOSITORY_PATH: << parameters.repository-path >>
             INPUT_WHEN_BRANCH_MATCHES: << parameters.when-branch-matches >>
+            INPUT_COVERAGE_FILES: << parameters.coverage-files >>
+            INPUT_TAGS: << parameters.tags >>
           command: << include(upload.sh) >>
 
   setup:
