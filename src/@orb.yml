@@ -7,6 +7,54 @@ display:
   home_url: https://github.com/Workshop64/buildpulse-circleci-orb
 
 commands:
+  save_cache:
+    description: Save a file or directory to BuildPulse Cache
+    parameters:
+      key:
+        description: |
+          The key to use when saving the cache. This key should be unique to the
+          files or directories being saved.
+        type: string
+      paths:
+        description: |
+          Paths to files or directories to save to the cache.
+        type: array
+      upload_chunk_size:
+        description: |
+          The maximum size of each chunk of the file to upload to the cache.
+        type: integer
+        default: 33554432 # 32 MB = 32 * 1024 * 1024
+    steps:
+    - run:
+        name: Save a file or directory to BuildPulse Cache
+        environment:
+          INPUT_KEY: << parameters.key >>
+          INPUT_PATHS: << parameters.paths >>
+          INPUT_UPLOAD_CHUNK_SIZE: << parameters.upload_chunk_size >>
+        command: ./cache.sh save
+
+  restore_cache:
+    description: Restore a file or directory from BuildPulse Cache
+    parameters:
+      key:
+        description: |
+          The key to use when restoring the cache. This key should be unique to the
+          files or directories being restored.
+        type: string
+      fail_on_cache_miss:
+        description: |
+          The key to use when restoring the cache. This key should be unique to the
+          files or directories being restored.
+        type: boolean
+        default: false
+    steps:
+      - run:
+          name: Restore a file or directory from BuildPulse Cache
+          environment:
+            INPUT_KEY: << parameters.key >>
+            INPUT_FAIL_ON_CACHE_MISS: << parameters.fail_on_cache_miss >>
+          command: ./cache.sh restore
+
   upload:
     description: Send test results to BuildPulse.
 

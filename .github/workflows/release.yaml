@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build_x64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./src/cache
+
+      - name: Build Cache Binaries
+        run: npm run build-x64
+        working-directory: ./src/cache
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}-x64
+          artifacts: ./src/cache/dist/*
+          draft: true
+          prerelease: true
+
+  build_arm64:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./src/cache
+
+      - name: Build Cache Binaries
+        run: npm run build-arm64
+        working-directory: ./src/cache
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}-arm64
+          artifacts: ./src/cache/dist/*
+          draft: true
+          prerelease: true
