@@ -1,0 +1,60 @@
+name: Build Cache
+
+on:
+  push:
+    branches: [ "cache" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_x64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./src/cache
+
+      - name: Build Cache Binaries
+        run: npm run build-x64
+        working-directory: ./src/cache
+
+      - name: Upload binaries as build artifacts
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: dist-x64
+          path: ./src/cache/dist/
+          retention-days: 730
+
+      - name: Set tag name for downstream jobs
+        id: tag
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
+
+  build_arm64:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./src/cache
+
+      - name: Build Cache Binaries
+        run: npm run build-arm64
+        working-directory: ./src/cache
+
+      - name: Upload binaries as build artifacts
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: dist-arm64
+          path: ./src/cache/dist/
+          retention-days: 730
+
+      - name: Set tag name for downstream jobs
+        id: tag
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
