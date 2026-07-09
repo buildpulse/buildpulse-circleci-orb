@@ -8,7 +8,7 @@ on:
 
 jobs:
   build_x64:
-    runs-on: ubuntu-latest
+    runs-on: bp-ubuntu-latest-x64-2x
 
     steps:
       - name: Checkout code
@@ -34,7 +34,7 @@ jobs:
         run: echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
 
   build_arm64:
-    runs-on: ubuntu-24.04-arm
+    runs-on: bp-ubuntu-latest-x64-2x-arm
 
     steps:
       - name: Checkout code
