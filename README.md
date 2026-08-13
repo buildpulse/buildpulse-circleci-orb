@@ -1,4 +1,6 @@
-# BuildPulse CircleCI Orb [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/workshop64/buildpulse)](https://circleci.com/orbs/registry/orb/workshop64/buildpulse) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/Workshop64/buildpulse-circleci-orb/master/LICENSE)
+<a href="https://buildpulse.io"><img src=".github/banner.svg" alt="buildpulse-circleci-orb, by BuildPulse" width="100%"></a>
+
+<a href="https://buildpulse.io/products/flaky-tests?ref=github-badge"><img src=".github/runs-on-buildpulse-compact.svg" alt="Runs on BuildPulse" height="28"></a>
 
 Easily connect your CircleCI jobs to [BuildPulse](https://buildpulse.io) to help you optimize [CI runners](https://buildpulse.io/products/runners) and find / [fix flaky tests](https://buildpulse.io/products/flaky-tests).
 
